@@ -14,3 +14,10 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 #    init:
 #      mode: always # 초기 스키마와 데이터를 추가하려면 활성화
+frontend:
+  server-url: http://localhost:3000/
+jwt:
+  secret: randomTestValueItisNotUsedInProdEnv
+  expiration: 1800000000 # 30 minutes
+  refresh:
+    expiration: 604800000 # 7 days
