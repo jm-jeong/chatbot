@@ -10,6 +10,9 @@ public record UserDto(
 	String gender,
 	String phone) {
 
+	public static UserDto of(String email, String password) {
+		return of(null, email, password, null, null);
+	}
 	public static UserDto of(String name, String email,String password, String gender, String phone) {
 		return new UserDto(null, name, email, password, gender, phone);
 	}
