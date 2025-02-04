@@ -1,6 +1,7 @@
 package com.jaemin.chatbot.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,7 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jaemin.chatbot.config.auth.UserAccountPrincipal;
+import com.jaemin.chatbot.dto.request.TokenRequest;
+import com.jaemin.chatbot.dto.request.UserLoginRequest;
 import com.jaemin.chatbot.dto.request.UserSignupRequest;
+import com.jaemin.chatbot.dto.response.TokenResponse;
 import com.jaemin.chatbot.dto.response.UserInfoResponse;
 import com.jaemin.chatbot.service.UserService;
 
@@ -38,6 +43,31 @@ public class UserController {
 		UserInfoResponse userInfoResponse = UserInfoResponse.fromDto(userService.getUserById(id));
 		return ResponseEntity.ok(userInfoResponse);
 	}
+
+	@Operation(summary = "사용자 로그인", description = "email, password 통해 로그인합니다.")
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest userLoginRequest) {
+		TokenResponse tokenResponse = TokenResponse.fromDto(userService.login(userLoginRequest.toDto()));
+		return ResponseEntity.ok(tokenResponse);
+	}
+
+	@Operation(summary = "refresh token", description = "refresh token 으로 access token 재발급합니다.")
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refresh(@RequestBody TokenRequest tokenRequest) {
+		TokenResponse tokenResponse = TokenResponse.fromDto(userService.refreshToken(tokenRequest.refreshToken()));
+		return ResponseEntity.ok(tokenResponse);
+
+	}
+
+	@GetMapping("/myInfo")
+	public ResponseEntity<?> myInfo(Authentication authentication){
+		UserAccountPrincipal userAccountPrincipal = (UserAccountPrincipal) authentication.getPrincipal();
+		UserInfoResponse userInfoResponse = UserInfoResponse.fromDto(userService.myInfo(userAccountPrincipal.getUsername()));
+		return ResponseEntity.ok(userInfoResponse);
+		// return new ResponseEntity<>(new ResponseDto<>(ResponseEnum.USER_MY_INFO_SUCCESS, result), HttpStatus.OK);
+
+	}
+
 
 	// @GetMapping("/myInfo")
 	// public ResponseEntity<?> myInfo(Authentication authentication){
